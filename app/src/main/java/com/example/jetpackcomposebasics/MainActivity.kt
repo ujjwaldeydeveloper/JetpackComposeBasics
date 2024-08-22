@@ -21,7 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.jetpackcomposebasics.ui.theme.JetpackComposeBasicsTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 
@@ -40,7 +43,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MyApp(modifier: Modifier = Modifier) {
-    var shouldShowOnboarding by remember { mutableStateOf(true) }
+    var shouldShowOnboarding by rememberSaveable { mutableStateOf(true) }
     Surface(modifier) {
         if (shouldShowOnboarding) {
             OnboardingScreen(
@@ -84,10 +87,11 @@ fun OnboardingPreview() {
 @Composable
 private fun Greetings(
     modifier: Modifier = Modifier,
-    names: List<String> = listOf("World", "Compose")
+    names: List<String> = List (100) { "Android #$it" }
+//    names: List<String> = listOf("World", "Compose")
 ) {
-    Column(modifier = modifier.padding(16.dp)) {
-        for (name in names) {
+    LazyColumn(modifier = modifier.padding(16.dp)) {
+        items( items = names) { name ->
             Greeting(
                 name = name,
                 modifier = modifier
@@ -98,7 +102,7 @@ private fun Greetings(
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
-    var isExpanded by remember { mutableStateOf(false) }
+    var isExpanded by rememberSaveable { mutableStateOf(false) }
     val extraPadding = if (isExpanded) 16.dp else 0.dp
 
     Surface(
