@@ -1,16 +1,27 @@
 package com.example.jetpackcomposebasics
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.unit.dp
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.Spring.DampingRatioHighBouncy
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.Icons.Filled
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Button
-import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -27,7 +38,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,7 +102,7 @@ private fun Greetings(
     names: List<String> = List (100) { "Android #$it" }
 //    names: List<String> = listOf("World", "Compose")
 ) {
-    LazyColumn(modifier = modifier.padding(16.dp)) {
+    LazyColumn(modifier = modifier.padding(vertical = 4.dp)) {
         items( items = names) { name ->
             Greeting(
                 name = name,
@@ -102,33 +114,64 @@ private fun Greetings(
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
-    var isExpanded by rememberSaveable { mutableStateOf(false) }
-    val extraPadding = if (isExpanded) 16.dp else 0.dp
-
-    Surface(
-        color = MaterialTheme.colorScheme.primary,
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primary
+        ),
         modifier = modifier.padding(vertical = 4.dp, horizontal = 8.dp)
     ) {
-        Row(modifier = Modifier.padding(24.dp)) {
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(bottom = extraPadding)
-            ) {
-                Text(
-                    text = "Hello",
+        CardContend(name = name)
+    }
+}
+
+@Composable
+fun CardContend(name: String) {
+    var isExpanded by rememberSaveable { mutableStateOf(false) }
+
+    Row(modifier = Modifier
+        .padding(24.dp)
+        .animateContentSize(
+            animationSpec = spring(
+                dampingRatio = DampingRatioHighBouncy,
+                stiffness = Spring.StiffnessLow
+            )
+        )) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(12.dp)
+        ) {
+            Text(
+                text = "Hello",
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = FontWeight.Bold
                 )
+            )
+            Text(
+                text = "$name!",
+                style = MaterialTheme.typography.headlineMedium
+            )
+            if (isExpanded) {
                 Text(
-                    text = "$name!",
+                    text = ("Composem ipsum color sit lazy, " +
+                            "padding theme elit, sed do bouncy. ").repeat(4),
                 )
-            }
-            ElevatedButton(
-                onClick = { isExpanded = !isExpanded },
-            ) {
-                Text(if (isExpanded) "Show less" else "Show more")
             }
 
         }
+        IconButton(onClick = { isExpanded = !isExpanded}) {
+            Icon(
+                imageVector = if (isExpanded) Filled.ExpandLess else Filled.ExpandMore,
+                contentDescription = if (isExpanded) {
+                    stringResource(R.string.show_less)
+                } else {
+                        stringResource(R.string.show_more)
+                }
+            )
+
+
+        }
+
     }
 }
 
@@ -140,6 +183,10 @@ fun GreetingPreview() {
     }
 }
 
+@Preview(showBackground = true,
+    widthDp = 320,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "Dark Mode")
 @Preview(showBackground = true, widthDp = 320, heightDp = 320)
 @Composable
 fun MyAppPreview() {
